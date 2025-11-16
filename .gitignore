@@ -2,6 +2,14 @@
 # OS junk
 .DS_Store
 Thumbs.db
+CONNECTION_STRING_GUNCELLEME.md
+POSTGRESQL_KURULUM_ADIMLARI.md
+PROJE_DURUM_RAPORU.md
+README.md
+setup-database.sql
+VISUAL_STUDIO_CALISTIRMA.md
+
+
 
 ## =============== DOTNET BUILD OUTPUT =============== ##
 bin/
