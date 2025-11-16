@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .info { color: blue; }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Admin Kontrol Test Sayfası</h1>
+    
+    <div class="test-box">
+        <h2>1. localStorage Kontrolü</h2>
+        <div id="localStorage-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>2. getCurrentUser() Kontrolü</h2>
+        <div id="user-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>3. isAdmin() Kontrolü</h2>
+        <div id="admin-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>4. Tam Detay</h2>
+        <pre id="full-details"></pre>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        // Test 1: localStorage
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
+        document.getElementById('localStorage-result').innerHTML = `
+            <p>Token: ${token ? '<span class="success">✅ VAR</span>' : '<span class="error">❌ YOK</span>'}</p>
+            <p>User String: ${userStr ? '<span class="success">✅ VAR</span>' : '<span class="error">❌ YOK</span>'}</p>
+            ${userStr ? `<pre>${userStr}</pre>` : ''}
+        `;
+
+        // Test 2: getCurrentUser()
+        const currentUser = getCurrentUser();
+        document.getElementById('user-result').innerHTML = `
+            <p>getCurrentUser() sonucu: ${currentUser ? '<span class="success">✅ VAR</span>' : '<span class="error">❌ NULL</span>'}</p>
+            ${currentUser ? `<pre>${JSON.stringify(currentUser, null, 2)}</pre>` : ''}
+            ${currentUser ? `<p class="info">Role: <strong>${currentUser.role}</strong></p>` : ''}
+        `;
+
+        // Test 3: isAdmin()
+        const adminCheck = isAdmin();
+        document.getElementById('admin-result').innerHTML = `
+            <p>isAdmin() sonucu: ${adminCheck ? '<span class="success">✅ TRUE (ADMIN)</span>' : '<span class="error">❌ FALSE (KULLANICI)</span>'}</p>
+        `;
+
+        // Test 4: Tam Detay
+        const details = {
+            'localStorage.token': token ? 'VAR' : 'YOK',
+            'localStorage.user': userStr || 'YOK',
+            'getCurrentUser()': currentUser,
+            'isAdmin()': adminCheck,
+            'Beklenen Sonuç': 'isAdmin() = true olmalı'
+        };
+        document.getElementById('full-details').textContent = JSON.stringify(details, null, 2);
+
+        // Console'a da yazdır
+        console.log('=== ADMIN TEST ===');
+        console.log('Token:', token ? 'VAR ✅' : 'YOK ❌');
+        console.log('User:', currentUser);
+        console.log('isAdmin():', adminCheck);
+        console.log('==================');
+    </script>
+</body>
+</html>
+
+

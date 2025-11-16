@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ödünçlerim - Kütüphane Sistemi</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <i class="bi bi-book"></i> Kütüphane Sistemi
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto" id="navMenu"></ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+      <div class="row mb-4">
+        <div class="col">
+          <h2>
+            <i class="bi bi-bookmark-check"></i>
+            <span id="loansTitle">Ödünçlerim</span>
+          </h2>
+          <p class="text-muted" id="loansSubtitle">
+            Aktif ve geçmiş ödünç kitaplarınızı görüntüleyin
+          </p>
+        </div>
+      </div>
+
+      <script>
+        // Admin için farklı başlık
+        if (typeof isAdmin === "function" && isAdmin()) {
+          document.getElementById("loansTitle").textContent =
+            "Ödünç Geçmişim (Admin)";
+          document.getElementById("loansSubtitle").innerHTML =
+            '<i class="bi bi-shield-check text-warning"></i> <strong>Admin Notu:</strong> Tüm ödünçleri görmek için Yönetim Paneli\'ni kullanın';
+        }
+      </script>
+
+      <!-- Alert -->
+      <div id="alertContainer"></div>
+
+      <!-- Filter Tabs -->
+      <ul class="nav nav-tabs mb-3" id="loanTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="all-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#all"
+            type="button"
+          >
+            <i class="bi bi-list"></i> Tümü (<span id="countAll">0</span>)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="pending-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#pending"
+            type="button"
+          >
+            <i class="bi bi-clock"></i> Beklemede (<span id="countPending"
+              >0</span
+            >)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="borrowed-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#borrowed"
+            type="button"
+          >
+            <i class="bi bi-book"></i> Ödünçte (<span id="countBorrowed">0</span
+            >)
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="returned-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#returned"
+            type="button"
+          >
+            <i class="bi bi-check-circle"></i> İade Edildi (<span
+              id="countReturned"
+              >0</span
+            >)
+          </button>
+        </li>
+      </ul>
+
+      <!-- Tab Content -->
+      <div class="tab-content" id="loanTabContent">
+        <div class="tab-pane fade show active" id="all">
+          <div id="allLoansContainer"></div>
+        </div>
+        <div class="tab-pane fade" id="pending">
+          <div id="pendingLoansContainer"></div>
+        </div>
+        <div class="tab-pane fade" id="borrowed">
+          <div id="borrowedLoansContainer"></div>
+        </div>
+        <div class="tab-pane fade" id="returned">
+          <div id="returnedLoansContainer"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+      requireAuth();
+      updateNavigation();
+
+      let allLoans = [];
+
+      async function init() {
+        await loadLoans();
+      }
+
+      async function loadLoans() {
+        try {
+          const response = await api.get("/api/Loans/my");
+          allLoans = response && response.data ? response.data : [];
+
+          displayLoans();
+          updateCounts();
+        } catch (error) {
+          console.error("Ödünçler yüklenirken hata:", error);
+          showAlert("danger", "Ödünçler yüklenemedi: " + error.message);
+        }
+      }
+
+      function displayLoans() {
+        const allContainer = document.getElementById("allLoansContainer");
+        const pendingContainer = document.getElementById(
+          "pendingLoansContainer"
+        );
+        const borrowedContainer = document.getElementById(
+          "borrowedLoansContainer"
+        );
+        const returnedContainer = document.getElementById(
+          "returnedLoansContainer"
+        );
+
+        const pendingLoans = allLoans.filter((l) => l.status === 0); // Pending
+        const borrowedLoans = allLoans.filter((l) => l.status === 1); // Borrowed
+        const returnedLoans = allLoans.filter((l) => l.status === 2); // Returned
+
+        allContainer.innerHTML = renderLoanCards(allLoans);
+        pendingContainer.innerHTML = renderLoanCards(pendingLoans);
+        borrowedContainer.innerHTML = renderLoanCards(borrowedLoans);
+        returnedContainer.innerHTML = renderLoanCards(returnedLoans);
+      }
+
+      function renderLoanCards(loans) {
+        const userIsAdmin = isAdmin();
+
+        if (loans.length === 0) {
+          return '<div class="alert alert-info"><i class="bi bi-info-circle"></i> Henüz ödünç kaydı bulunmuyor.</div>';
+        }
+
+        return loans
+          .map(
+            (loan) => `
+                <div class="card mb-3 ${loan.isLate ? "border-danger" : ""}">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                ${
+                                  userIsAdmin
+                                    ? `<span class="badge bg-secondary mb-2">ID: ${loan.id} | Kitap: ${loan.bookId}</span><br>`
+                                    : ""
+                                }
+                                <h5 class="card-title mb-1">${
+                                  loan.bookTitle
+                                }</h5>
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-person"></i> ${
+                                      loan.bookAuthor
+                                    } | 
+                                    <i class="bi bi-tag"></i> ${
+                                      loan.categoryName
+                                    }
+                                </p>
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar"></i> Alındı: ${formatDate(
+                                          loan.loanDate
+                                        )}
+                                    </small>
+                                </div>
+                                 ${
+                                   loan.dueDate
+                                     ? `
+                                     <div class="mb-2">
+                                         <small class="${getDueDateClass(
+                                           loan
+                                         )}">
+                                             <i class="bi bi-calendar-event"></i> Teslim Tarihi: ${formatDate(
+                                               loan.dueDate
+                                             )}
+                                             ${
+                                               loan.isLate
+                                                 ? " <strong>(GECİKMİŞ! ⚠️)</strong>"
+                                                 : ""
+                                             }
+                                             ${
+                                               loan.daysRemaining !== null &&
+                                               loan.daysRemaining > 0
+                                                 ? ` (${loan.daysRemaining} gün kaldı)`
+                                                 : loan.daysRemaining !==
+                                                     null &&
+                                                   loan.daysRemaining <= 0 &&
+                                                   !loan.isLate
+                                                 ? ` (Süre doldu)`
+                                                 : ""
+                                             }
+                                         </small>
+                                     </div>
+                                 `
+                                     : loan.status === 0
+                                     ? `
+                                     <div class="mb-2">
+                                         <small class="text-muted">
+                                             <i class="bi bi-clock"></i> Admin onayı bekleniyor... (Teslim tarihi belirlenecek)
+                                         </small>
+                                     </div>
+                                 `
+                                     : ""
+                                 }
+                                ${
+                                  loan.returnDate
+                                    ? `
+                                    <div class="mb-2">
+                                        <small class="text-success">
+                                            <i class="bi bi-check-circle"></i> İade Tarihi: ${formatDate(
+                                              loan.returnDate
+                                            )}
+                                        </small>
+                                    </div>
+                                `
+                                    : ""
+                                }
+                                ${
+                                  userIsAdmin && loan.createdAt
+                                    ? `
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock-history"></i> Oluşturulma: ${formatDate(
+                                              loan.createdAt
+                                            )}
+                                        </small>
+                                    </div>
+                                `
+                                    : ""
+                                }
+                            </div>
+                            <div class="col-md-3 text-center">
+                                ${getStatusBadge(loan.status)}
+                                ${
+                                  loan.adminNote
+                                    ? `
+                                    <div class="mt-2 alert alert-warning py-1 px-2">
+                                        <small><strong>Admin Notu:</strong><br>${loan.adminNote}</small>
+                                    </div>
+                                `
+                                    : ""
+                                }
+                            </div>
+                            <div class="col-md-3 text-end">
+                                ${
+                                  loan.status === 1
+                                    ? `
+                                    <button class="btn btn-success btn-sm w-100" onclick="returnBook(${loan.id})">
+                                        <i class="bi bi-arrow-return-left"></i> İade Et
+                                    </button>
+                                `
+                                    : ""
+                                }
+                                ${
+                                  userIsAdmin
+                                    ? `
+                                    <button class="btn btn-outline-info btn-sm w-100 mt-2" onclick="viewInAdminPanel(${loan.id})">
+                                        <i class="bi bi-gear"></i> Yönetim Paneli'nde Aç
+                                    </button>
+                                `
+                                    : ""
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function viewInAdminPanel(loanId) {
+        window.location.href = `/pages/admin-dashboard.html?tab=loans&loanId=${loanId}`;
+      }
+
+      function getStatusBadge(status) {
+        const badges = {
+          0: '<span class="badge bg-warning"><i class="bi bi-clock"></i> Beklemede</span>',
+          1: '<span class="badge bg-primary"><i class="bi bi-book"></i> Ödünçte</span>',
+          2: '<span class="badge bg-success"><i class="bi bi-check-circle"></i> İade Edildi</span>',
+          3: '<span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> Gecikmiş</span>',
+          4: '<span class="badge bg-secondary"><i class="bi bi-x-circle"></i> İptal Edildi</span>',
+        };
+        return badges[status] || "";
+      }
+
+      function getDueDateClass(loan) {
+        if (loan.isLate) return "text-danger";
+        if (loan.daysRemaining !== null && loan.daysRemaining <= 3)
+          return "text-warning";
+        return "text-muted";
+      }
+
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("tr-TR");
+      }
+
+      function updateCounts() {
+        document.getElementById("countAll").textContent = allLoans.length;
+        document.getElementById("countPending").textContent = allLoans.filter(
+          (l) => l.status === 0
+        ).length;
+        document.getElementById("countBorrowed").textContent = allLoans.filter(
+          (l) => l.status === 1
+        ).length;
+        document.getElementById("countReturned").textContent = allLoans.filter(
+          (l) => l.status === 2
+        ).length;
+      }
+
+      async function returnBook(loanId) {
+        if (!confirm("Bu kitabı iade etmek istediğinizden emin misiniz?"))
+          return;
+
+        try {
+          await api.put(`/api/Loans/${loanId}/return`);
+          showAlert("success", "Kitap başarıyla iade edildi!");
+          await loadLoans();
+        } catch (error) {
+          console.error("İade işlemi başarısız:", error);
+          showAlert("danger", "İade işlemi başarısız: " + error.message);
+        }
+      }
+
+      function showAlert(type, message) {
+        const alertContainer = document.getElementById("alertContainer");
+        alertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        setTimeout(() => {
+          alertContainer.innerHTML = "";
+        }, 5000);
+      }
+
+      // Initialize
+      init();
+    </script>
+  </body>
+</html>

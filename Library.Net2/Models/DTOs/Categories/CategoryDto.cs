@@ -1,0 +1,10 @@
+namespace Library.Net2.Models.DTOs.Categories;
+
+public class CategoryDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
+    public int BookCount { get; set; }
+}
+

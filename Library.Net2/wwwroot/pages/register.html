@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - Kütüphane Sistemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-plus text-primary" style="font-size: 4rem;"></i>
+                <h2 class="mt-3">Kayıt Ol</h2>
+                <p class="text-muted">Yeni hesap oluştur</p>
+            </div>
+
+            <div id="alertContainer"></div>
+
+            <form id="registerForm">
+                <div class="mb-3">
+                    <label for="fullName" class="form-label">Ad Soyad</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="fullName" name="fullName" required
+                               placeholder="Adınız Soyadınız">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-posta</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control" id="email" name="email" required
+                               placeholder="ornek@email.com">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Şifre</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" required
+                               placeholder="••••••••" minlength="6">
+                    </div>
+                    <small class="text-muted">En az 6 karakter</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Şifre Tekrar</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required
+                               placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary btn-lg" id="registerBtn">
+                        <i class="bi bi-person-plus"></i> Kayıt Ol
+                    </button>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-muted">Zaten hesabınız var mı? <a href="login.html">Giriş Yap</a></p>
+                    <p class="text-muted mt-2"><a href="../index.html">Ana Sayfaya Dön</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/api.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('registerBtn');
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showAlert('danger', 'Şifreler eşleşmiyor!');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Kayıt yapılıyor...';
+            
+            try {
+                const response = await api.post('/api/Auth/register', { fullName, email, password });
+                
+                if (response.success) {
+                    showAlert('success', 'Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...');
+                } else {
+                    throw new Error(response.message || 'Kayıt başarısız');
+                }
+                
+                setTimeout(() => {
+                    window.location.href = '/pages/login.html';
+                }, 2000);
+            } catch (error) {
+                showAlert('danger', error.message || 'Kayıt başarısız. Lütfen bilgilerinizi kontrol edin.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-person-plus"></i> Kayıt Ol';
+            }
+        });
+
+        function showAlert(type, message) {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.getElementById('alertContainer').innerHTML = alertHtml;
+        }
+    </script>
+</body>
+</html>
+
