@@ -1,6 +1,0 @@
-@Library.Net2_HostAddress = http://localhost:5101
-
-GET {{Library.Net2_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
