@@ -197,6 +197,39 @@ async function deleteBook(bookId) {
     }
 }
 
+// Image Upload Functions
+async function uploadBookImage(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        const response = await api.post('/api/Books/upload-image', formData);
+        return response.data; // Returns the image URL
+    } catch (error) {
+        throw new Error('Resim yüklenirken hata: ' + error.message);
+    }
+}
+
+function clearImagePreview() {
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('previewImg').src = '';
+    document.getElementById('bookImageInput').value = '';
+    document.getElementById('bookImageUrl').value = '';
+}
+
+// Image preview on file selection
+document.getElementById('bookImageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('previewImg').src = event.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
 // Add Book Form
 document.getElementById('addBookForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -212,12 +245,20 @@ document.getElementById('addBookForm').addEventListener('submit', async (e) => {
     };
     
     try {
+        // Upload image if selected
+        const imageInput = document.getElementById('bookImageInput');
+        if (imageInput.files.length > 0) {
+            const imageUrl = await uploadBookImage(imageInput.files[0]);
+            data.imageUrl = imageUrl;
+        }
+        
         await api.post('/api/Books', data);
         showAlert('success', 'Kitap başarıyla eklendi!');
         const modal = document.getElementById('addBookModal');
         const bsModal = bootstrap.Modal.getInstance(modal);
         if (bsModal) bsModal.hide();
         e.target.reset();
+        clearImagePreview();
         await loadBooks();
     } catch (error) {
         console.error('Kitap eklenirken hata:', error);

@@ -114,3 +114,5 @@ C:\Users\90506\source\repos\Library.Net2\Library.Net2\obj\Debug\net8.0\refint\Li
 C:\Users\90506\source\repos\Library.Net2\Library.Net2\obj\Debug\net8.0\Library.Net2.pdb
 C:\Users\90506\source\repos\Library.Net2\Library.Net2\obj\Debug\net8.0\Library.Net2.genruntimeconfig.cache
 C:\Users\90506\source\repos\Library.Net2\Library.Net2\obj\Debug\net8.0\ref\Library.Net2.dll
+C:\Users\90506\source\repos\Library.Net2\Library.Net2\obj\Debug\net8.0\Library.Net2.sourcelink.json
+C:\Users\90506\source\repos\Library.Net2\Library.Net2\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

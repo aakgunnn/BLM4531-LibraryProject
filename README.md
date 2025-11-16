@@ -1,203 +1,372 @@
-# Kütüphane Yönetim Sistemi 📚
+# 📚 Library.Net2 - Kütüphane Yönetim Sistemi
 
-Modern ve kullanıcı dostu bir kütüphane yönetim sistemi. ASP.NET Core 8, PostgreSQL ve vanilla JavaScript ile geliştirilmiştir.
+ASP.NET Core 8 Web API ve PostgreSQL ile geliştirilmiş modern kütüphane yönetim sistemi.
 
-## 📋 Proje Hakkında
+---
 
-Bu proje, kütüphane operasyonlarının dijital ortamda yönetilmesini sağlar. Üyeler kitap katalogunu görüntüleyip arama yapar, uygun kitapları ödünç alır ve iade eder. Görevliler (admin) kitap ve kategori yönetimi, stok güncelleme, gecikme ve raporlama işlemlerini yürütür.
+## 🚀 Özellikler
 
-## ✅ Tamamlanan Özellikler (Bu Hafta)
+### ✅ Kimlik Doğrulama ve Yetkilendirme
+- ✅ Kullanıcı kayıt ve giriş sistemi
+- ✅ JWT Bearer Token tabanlı kimlik doğrulama
+- ✅ Role-Based Authorization (Admin / Member)
+- ✅ Güvenli password hashing (BCrypt)
 
-### 🗄️ Database Katmanı
-- ✅ PostgreSQL veritabanı entegrasyonu
-- ✅ Entity Framework Core 8 ORM
-- ✅ Domain Entity'leri (User, Book, Category, Loan)
-- ✅ Entity Configurations ve ilişkiler
-- ✅ Migration sistemi
-- ✅ Seed Data (test kategorileri, admin kullanıcı, örnek kitaplar)
+### ✅ Kitap Yönetimi
+- ✅ Kitap listeleme (tüm kullanıcılar)
+- ✅ Kitap arama ve filtreleme (başlık, yazar, kategori)
+- ✅ Kitap ekleme/düzenleme/silme (Admin)
+- ✅ Kitap müsaitlik durumu yönetimi (Admin)
+- ✅ Kitap kapak resmi yükleme (Admin) - **Backend hazır, frontend test edilmedi**
+- ✅ ISBN, yayın yılı, kategori bilgileri
 
-### 🎨 Frontend Katmanı
-- ✅ Modern ve responsive tasarım (Bootstrap 5)
-- ✅ Kullanıcı sayfaları:
-  - Ana sayfa (landing page)
-  - Giriş & Kayıt sayfaları
-  - Kitap kataloğu (arama ve filtreleme)
-  - Ödünçlerim sayfası
-- ✅ Admin sayfaları:
-  - Dashboard (istatistikler)
-  - Ödünç yönetimi (onaylama/reddetme)
-  - Kitap yönetimi (ekleme/güncelleme)
-  - Kategori yönetimi
-- ✅ JavaScript API Client servisi
-- ✅ Auth utility fonksiyonları
+### ✅ Kategori Yönetimi
+- ✅ Kategori listeleme
+- ✅ Kategori ekleme/düzenleme (Admin)
+- ✅ Kategori aktif/pasif durumu (Admin)
 
-## 🔜 Gelecek Haftalarda Yapılacaklar
+### ✅ Ödünç Alma ve İade Sistemi
+- ✅ Ödünç alma talebi oluşturma (Member)
+- ✅ Ödünç talep onaylama/reddetme (Admin)
+- ✅ Kitap iade etme (Member)
+- ✅ Otomatik iade tarihi hesaplama (14 gün)
+- ✅ Geciken ödünç alma kayıtları takibi
+- ✅ Ödünç durumu: Bekliyor, Onaylandı, Reddedildi, İade Edildi
 
-### Backend Geliştirme
-- [ ] Repository Pattern implementasyonu
-- [ ] Application Services katmanı
-- [ ] JWT Authentication & Authorization
-- [ ] REST API Controllers
-- [ ] DTOs ve validation
-- [ ] Global exception handling
-- [ ] İş kuralları (ödünç uygunluğu, gecikme hesabı)
+### ✅ Admin Dashboard
+- ✅ Kitap, kategori ve ödünç istatistikleri
+- ✅ Bekleyen ödünç talepleri yönetimi
+- ✅ Aktif ödünç kayıtları görüntüleme
+- ✅ Tüm ödünç kayıtlarını listeleme
+- ✅ Geciken ödünç kayıtları raporu
 
-### Test & Deployment
-- [ ] API testleri
-- [ ] Docker containerization
-- [ ] Production deployment
+### ✅ Kullanıcı Arayüzü
+- ✅ Modern ve responsive Bootstrap 5 tasarım
+- ✅ Dinamik navbar (login durumuna göre)
+- ✅ Admin ve Member için farklı UI deneyimi
+- ✅ Kitap katalog sayfası (arama ve filtreleme)
+- ✅ Kullanıcı ödünç geçmişi sayfası
+- ✅ Admin dashboard ve yönetim panelleri
 
-## 🛠️ Teknoloji Stack'i
+---
 
-- **Backend:** ASP.NET Core 8 Web API
-- **Database:** PostgreSQL 16
+## 🛠️ Teknolojiler
+
+### Backend
+- **Framework:** ASP.NET Core 8 Web API
+- **Database:** PostgreSQL
 - **ORM:** Entity Framework Core 8
-- **Frontend:** HTML5, CSS3, JavaScript (ES6+)
-- **UI Framework:** Bootstrap 5
-- **Authentication:** JWT Bearer Token (gelecek sprint)
+- **Authentication:** JWT Bearer Token
+- **Password Hashing:** BCrypt.Net
+- **Architecture:** Repository Pattern + Unit of Work
 
-## 📦 Kurulum
+### Frontend
+- **HTML5, CSS3, JavaScript (ES6+)**
+- **Bootstrap 5.3**
+- **Bootstrap Icons**
+- **Fetch API** (RESTful API iletişimi)
+
+---
+
+## 📁 Proje Yapısı
+
+```
+Library.Net2/
+│
+├── Controllers/               # API Endpoint'leri
+│   ├── AuthController.cs      # Login/Register
+│   ├── BooksController.cs     # Kitap CRUD + Resim yükleme
+│   ├── CategoriesController.cs
+│   ├── LoansController.cs     # Kullanıcı ödünç işlemleri
+│   └── AdminLoansController.cs # Admin ödünç yönetimi
+│
+├── Data/
+│   ├── AppDbContext.cs        # Database Context
+│   ├── DbSeeder.cs            # Seed data
+│   └── Configurations/        # Entity configurations
+│
+├── Models/
+│   ├── Domain/                # Entity models
+│   │   ├── User.cs
+│   │   ├── Book.cs
+│   │   ├── Category.cs
+│   │   └── Loan.cs
+│   │
+│   └── DTOs/                  # Data Transfer Objects
+│       ├── Auth/
+│       ├── Books/
+│       ├── Categories/
+│       └── Loans/
+│
+├── Repositories/              # Repository Pattern
+│   ├── IRepository.cs
+│   ├── Repository.cs
+│   ├── IUnitOfWork.cs
+│   └── UnitOfWork.cs
+│
+├── Services/                  # Business Logic
+│   ├── IJwtService.cs & JwtService.cs
+│   ├── IAuthService.cs & AuthService.cs
+│   ├── IBookService.cs & BookService.cs
+│   ├── ICategoryService.cs & CategoryService.cs
+│   └── ILoanService.cs & LoanService.cs
+│
+├── Migrations/                # EF Core Migrations
+│
+└── wwwroot/                   # Frontend (Static Files)
+    ├── index.html             # Ana sayfa
+    ├── pages/
+    │   ├── login.html
+    │   ├── register.html
+    │   ├── catalog.html       # Kitap kataloğu
+    │   ├── my-loans.html      # Kullanıcı ödünç geçmişi
+    │   └── admin-dashboard.html
+    ├── css/
+    │   └── style.css
+    ├── js/
+    │   ├── api.js             # API client
+    │   ├── auth.js            # Auth utilities
+    │   └── admin.js           # Admin dashboard logic
+    └── images/
+        └── books/             # Kitap kapak görselleri
+```
+
+---
+
+## 🗄️ Database Schema
+
+### Users
+- `Id` (PK)
+- `Email` (Unique)
+- `FullName`
+- `PasswordHash`
+- `Role` (Admin / Member)
+- `CreatedAt`, `UpdatedAt`
+
+### Books
+- `Id` (PK)
+- `Title`
+- `Author`
+- `CategoryId` (FK)
+- `ISBN`
+- `PublishYear`
+- `ImageUrl` *(yeni eklendi)*
+- `IsAvailable`
+- `CreatedAt`, `UpdatedAt`
+
+### Categories
+- `Id` (PK)
+- `Name`
+- `IsActive`
+- `CreatedAt`, `UpdatedAt`
+
+### Loans
+- `Id` (PK)
+- `BookId` (FK)
+- `UserId` (FK)
+- `LoanDate`
+- `DueDate` (Nullable)
+- `ReturnDate` (Nullable)
+- `Status` (Enum: Pending, Approved, Rejected, Returned)
+- `AdminNote`
+- `CreatedAt`, `UpdatedAt`
+
+---
+
+## 🔧 Kurulum ve Çalıştırma
 
 ### Gereksinimler
 - .NET 8 SDK
-- PostgreSQL 16+
+- PostgreSQL
 - Visual Studio 2022 veya VS Code
 
 ### Adımlar
 
-1. **Repository'yi klonlayın:**
+1. **Projeyi klonlayın**
 ```bash
-git clone <repository-url>
+git clone <repo-url>
 cd Library.Net2
 ```
 
-2. **PostgreSQL veritabanını hazırlayın:**
-```sql
-CREATE DATABASE LibraryDb;
-```
-
-3. **Connection string'i güncelleyin:**
-`appsettings.json` dosyasında PostgreSQL bilgilerinizi düzenleyin:
+2. **Veritabanı bağlantı ayarları** (`appsettings.json`)
 ```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=LibraryDb;Username=postgres;Password=your_password"
-  }
+"ConnectionStrings": {
+  "DefaultConnection": "Host=localhost;Database=LibraryDb;Username=postgres;Password=your_password"
 }
 ```
 
-4. **Projeyi çalıştırın:**
+3. **Migration'ları uygulayın**
 ```bash
 cd Library.Net2
+dotnet ef database update
+```
+
+4. **Uygulamayı çalıştırın**
+```bash
 dotnet run
 ```
 
-5. **Tarayıcıda açın:**
-```
-https://localhost:5001
-```
-
-## 👥 Demo Hesaplar
-
-### Admin Hesabı
-- **Email:** admin@library.com
-- **Şifre:** Admin123!
-
-### Üye Hesabı
-- **Email:** ahmet@example.com
-- **Şifre:** Member123!
-
-## 📊 Database Şeması
-
-### Users
-- id, full_name, email (unique), password_hash, role, created_at, updated_at
-
-### Categories
-- id, name, is_active, created_at, updated_at
-
-### Books
-- id, title, author, category_id, isbn, publish_year, is_available, created_at, updated_at
-
-### Loans
-- id, user_id, book_id, loan_date, due_date, return_date, status, admin_note, created_at, updated_at
-
-## 🎯 Roller ve Yetkiler
-
-### Member (Üye)
-- Kitapları listeleme ve arama
-- Ödünç talebi oluşturma
-- Aktif ödünçleri görüntüleme
-- İade talebi oluşturma
-
-### Admin (Görevli)
-- Tüm üye yetkileri
-- Kitap ve kategori yönetimi
-- Ödünç taleplerini onaylama/reddetme
-- Gecikmeleri izleme
-- Raporlama
-
-## 📱 Sayfa Yapısı
-
-```
-/                       → Ana sayfa (landing)
-/pages/login.html       → Giriş sayfası
-/pages/register.html    → Kayıt sayfası
-/pages/catalog.html     → Kitap kataloğu
-/pages/my-loans.html    → Ödünçlerim
-/pages/admin-dashboard.html → Admin paneli
-```
-
-## 🚀 API Endpoints (Planlanmış)
-
-### Authentication
-- `POST /api/auth/register` - Yeni üye kaydı
-- `POST /api/auth/login` - Giriş yapma
-- `GET /api/auth/me` - Kullanıcı bilgileri
-
-### Books & Categories
-- `GET /api/books` - Kitap listesi
-- `POST /api/books` - Yeni kitap ekleme (Admin)
-- `PUT /api/books/{id}` - Kitap güncelleme (Admin)
-- `DELETE /api/books/{id}` - Kitap silme (Admin)
-- `GET /api/categories` - Kategori listesi
-- `POST /api/categories` - Kategori ekleme (Admin)
-
-### Loans
-- `POST /api/loans` - Ödünç talebi
-- `GET /api/loans-user/{userId}` - Kullanıcı ödünçleri
-- `PUT /api/loans/{id}/return` - İade talebi
-- `GET /api/admin/loans` - Tüm ödünçler (Admin)
-- `PUT /api/admin/loans/{id}/approve` - Ödünç onaylama (Admin)
-- `PUT /api/admin/loans/{id}/reject` - Ödünç reddetme (Admin)
-
-## 🎨 Tasarım Özellikleri
-
-- Modern gradient renk paleti
-- Smooth animasyonlar ve transitions
-- Responsive design (mobil uyumlu)
-- Kullanıcı dostu form validasyonları
-- Loading state'leri
-- Toast/Alert bildirimleri
-- Icon kütüphanesi (Bootstrap Icons)
-
-## 📝 Notlar
-
-- Migration'lar otomatik olarak uygulanır
-- Seed data ilk çalıştırmada yüklenir
-- CORS tüm origin'lere açık (development için)
-- HTTPS redirect aktif
-
-## 🤝 Katkıda Bulunma
-
-Bu proje eğitim amaçlıdır. Önerileriniz için issue açabilirsiniz.
-
-## 📄 Lisans
-
-MIT License
+5. **Tarayıcıda açın**
+- Frontend: `http://localhost:5000`
+- Swagger: `http://localhost:5000/swagger`
 
 ---
 
-**Geliştirici:** Library.Net2 Team  
-**Tarih:** Kasım 2025  
-**Versiyon:** 0.1.0 (Development)
+## 👤 Seed Data (Varsayılan Kullanıcılar)
 
+Uygulama ilk çalıştırıldığında otomatik olarak oluşturulur:
+
+### Admin
+- **Email:** `admin@library.com`
+- **Şifre:** `Admin123!`
+- **Yetki:** Tüm yönetim işlemleri
+
+### Member (Test Kullanıcısı)
+- **Email:** `ahmet@test.com`
+- **Şifre:** `Test123!`
+- **Yetki:** Kitap görüntüleme ve ödünç alma
+
+### Örnek Veriler
+- 5 Kategori (Roman, Bilim Kurgu, Tarih, Psikoloji, Felsefe)
+- 10 Kitap (her kategoriden örnek kitaplar)
+
+---
+
+## 📡 API Endpoints
+
+### Authentication (`/api/Auth`)
+- `POST /register` - Yeni kullanıcı kaydı
+- `POST /login` - Giriş yapma (JWT token döner)
+
+### Books (`/api/Books`)
+- `GET /` - Tüm kitapları listele
+- `GET /{id}` - ID'ye göre kitap getir
+- `GET /search?q=...&categoryId=...` - Kitap ara
+- `POST /` - Yeni kitap ekle *(Admin)*
+- `PUT /{id}` - Kitap güncelle *(Admin)*
+- `DELETE /{id}` - Kitap sil *(Admin)*
+- `POST /upload-image` - Kitap kapağı yükle *(Admin)* 🆕
+
+### Categories (`/api/Categories`)
+- `GET /` - Tüm kategorileri listele
+- `POST /` - Yeni kategori ekle *(Admin)*
+- `PUT /{id}` - Kategori güncelle *(Admin)*
+
+### Loans - User (`/api/Loans`)
+- `POST /` - Ödünç alma talebi oluştur *(Member)*
+- `GET /my-loans` - Kendi ödünç kayıtlarım
+- `PUT /{id}/return` - Kitap iade et *(Member)*
+
+### Loans - Admin (`/api/Admin/Loans`)
+- `GET /` - Tüm ödünç kayıtları *(Admin)*
+- `GET /late` - Geciken ödünç kayıtları *(Admin)*
+- `PUT /{id}/approve` - Ödünç talebini onayla *(Admin)*
+- `PUT /{id}/reject` - Ödünç talebini reddet *(Admin)*
+
+---
+
+## 🔐 Authentication Flow
+
+1. Kullanıcı `/login` veya `/register` ile giriş yapar
+2. Backend JWT token oluşturur ve döner
+3. Frontend token'ı `localStorage`'da saklar
+4. Sonraki isteklerde `Authorization: Bearer <token>` header'ı ile gönderilir
+5. Backend token'ı doğrular ve kullanıcı bilgilerini çıkarır
+
+---
+
+## 🎨 Frontend Özellikleri
+
+### Dinamik UI
+- Login durumuna göre navbar değişir
+- Admin ve Member için farklı kitap kartları
+- Admin: Düzenle, Sil, Durum Değiştir butonları
+- Member: Sadece Ödünç Al butonu
+
+### Sayfa Koruması
+- Giriş yapmadan korumalı sayfalara erişilemez
+- Admin sayfalarına sadece Admin erişebilir
+- Otomatik yönlendirme
+
+### Responsive Tasarım
+- Mobil, tablet ve masaüstü uyumlu
+- Bootstrap 5 grid sistemi
+- Modern ve kullanıcı dostu arayüz
+
+---
+
+## 🐛 Bilinen Sorunlar ve Geçmiş Hatalar
+
+### Çözülen Hatalar:
+1. ✅ Static files (wwwroot) 404 hatası → `WebRootPath` ve `FileProvider` yapılandırması
+2. ✅ PostgreSQL DateTime timezone hatası → `Npgsql.EnableLegacyTimestampBehavior`
+3. ✅ Frontend `isAdmin()` false döndürme → UserDto.Role string'e çevrildi
+4. ✅ Admin UI özelleşmesi → Admin ve Member için ayrı render logic
+5. ✅ Migration duplicate table hatası → Migration dosyası temizlendi
+6. ✅ `DueDate` null hatası → Loan.DueDate nullable yapıldı
+7. ✅ JSON parse error (204 No Content) → api.js'de response kontrolü
+
+### Test Edilmemiş:
+- ⚠️ Kitap kapak resmi yükleme (backend hazır, frontend test edilmedi)
+
+---
+
+## 📊 Proje Durumu
+
+### ✅ Tamamlanan Özellikler (Yaklaşık %80-85)
+- Authentication & Authorization
+- Books & Categories Management
+- Loan & Return System
+- Admin Dashboard
+- Frontend UI
+- Database Design
+
+### 🚧 Yarım Kalan / Test Edilmemiş
+- Kitap kapak resmi yükleme (kod yazıldı, test edilmedi)
+- Email bildirimleri (planlanmadı)
+- Detaylı raporlama (planlanmadı)
+
+### ❌ Yapılmadı
+- Unit/Integration Tests
+- API Documentation (Swagger'da mevcut)
+- Docker deployment
+- CI/CD Pipeline
+
+---
+
+## 🤝 Katkıda Bulunma
+
+Proje eğitim amaçlı geliştirilmiştir. Katkıda bulunmak için:
+1. Fork yapın
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Commit yapın (`git commit -m 'Add amazing feature'`)
+4. Push yapın (`git push origin feature/amazing-feature`)
+5. Pull Request açın
+
+---
+
+## 📝 Notlar
+
+- Proje, ASP.NET Core Web API ve modern frontend teknolojilerini öğrenmek için geliştirilmiştir
+- Production ortamı için ek güvenlik önlemleri (rate limiting, CORS, HTTPS, etc.) alınmalıdır
+- Şifreler BCrypt ile hashlenmiş olarak saklanır
+- JWT token süresi 7 gün olarak ayarlanmıştır
+- Ödünç alma süresi 14 gün olarak belirlenmiştir
+
+---
+
+## 📧 İletişim
+
+Sorularınız için: `your-email@example.com`
+
+---
+
+## 📄 Lisans
+
+Bu proje eğitim amaçlıdır ve açık kaynak olarak paylaşılmıştır.
+
+---
+
+**Son Güncelleme:** 15 Kasım 2024  
+**Versiyon:** 1.0  
+**Geliştirici:** Library.Net2 Team

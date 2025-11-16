@@ -213,6 +213,18 @@
                             <label class="form-label">Yayın Yılı</label>
                             <input type="number" class="form-control" name="publishYear" min="1000" max="2099">
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Kitap Kapağı</label>
+                            <input type="file" class="form-control" id="bookImageInput" accept="image/*">
+                            <small class="text-muted">Max 5MB - JPG, PNG, GIF, WEBP</small>
+                            <div id="imagePreview" class="mt-2" style="display: none;">
+                                <img id="previewImg" src="" alt="Önizleme" class="img-thumbnail" style="max-height: 200px;">
+                                <button type="button" class="btn btn-sm btn-danger mt-2" onclick="clearImagePreview()">
+                                    <i class="bi bi-x"></i> Resmi Kaldır
+                                </button>
+                            </div>
+                            <input type="hidden" name="imageUrl" id="bookImageUrl">
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>

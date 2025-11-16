@@ -4,3 +4,13 @@ PROJE_DURUM_RAPORU.md
 setup-database.sql
 VISUAL_STUDIO_CALISTIRMA.md
 .vs
+Library.Net2/bin/
+Library.Net2/appsettings.Development.json
+Library.Net2/appsettings.json
+Library.Net2/fix-duedate.sql
+Library.Net2/library.db
+Library.Net2/library.db-shm
+Library.Net2/library.db-wal
+Library.Net2/TEST_POSTGRESQL.md
+README.md
+

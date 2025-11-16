@@ -260,9 +260,10 @@
                         <div class="position-absolute top-0 end-0 m-2">
                             <span class="badge bg-primary">ID: ${book.id}</span>
                         </div>
-                        <div class="book-cover bg-gradient">
-                            <i class="bi bi-book text-white"></i>
-                        </div>
+                        ${book.imageUrl 
+                          ? `<img src="${book.imageUrl}" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">`
+                          : `<div class="book-cover bg-gradient"><i class="bi bi-book text-white"></i></div>`
+                        }
                         <div class="card-body">
                             <h6 class="card-title fw-bold mb-2">${
                               book.title
@@ -365,9 +366,10 @@
                     <div class="card book-card h-100 ${
                       !book.isAvailable ? "border-warning" : ""
                     }">
-                        <div class="book-cover">
-                            <i class="bi bi-book"></i>
-                        </div>
+                        ${book.imageUrl 
+                          ? `<img src="${book.imageUrl}" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">`
+                          : `<div class="book-cover"><i class="bi bi-book"></i></div>`
+                        }
                         <div class="card-body">
                             <h6 class="card-title text-truncate-2">${
                               book.title

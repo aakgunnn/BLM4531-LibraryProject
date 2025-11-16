@@ -143,5 +143,61 @@ public class BooksController : ControllerBase
             return StatusCode(500, ApiResponse<bool>.ErrorResponse("Bir hata oluştu: " + ex.Message));
         }
     }
+
+    /// <summary>
+    /// Kitap kapağı resmi yükle (Admin)
+    /// </summary>
+    [HttpPost("upload-image")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ApiResponse<string>>> UploadBookImage([FromForm] IFormFile file)
+    {
+        try
+        {
+            // Dosya kontrolü
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(ApiResponse<string>.ErrorResponse("Lütfen bir dosya seçin"));
+            }
+
+            // Dosya boyutu kontrolü (max 5MB)
+            if (file.Length > 5 * 1024 * 1024)
+            {
+                return BadRequest(ApiResponse<string>.ErrorResponse("Dosya boyutu en fazla 5MB olabilir"));
+            }
+
+            // Dosya uzantısı kontrolü
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            if (!allowedExtensions.Contains(extension))
+            {
+                return BadRequest(ApiResponse<string>.ErrorResponse("Sadece resim dosyaları yüklenebilir (jpg, png, gif, webp)"));
+            }
+
+            // Benzersiz dosya adı oluştur
+            var fileName = $"{Guid.NewGuid()}{extension}";
+            var uploadsFolder = Path.Combine("wwwroot", "images", "books");
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            // Klasör yoksa oluştur
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            // Dosyayı kaydet
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // URL döndür
+            var imageUrl = $"/images/books/{fileName}";
+            return Ok(ApiResponse<string>.SuccessResponse(imageUrl, "Resim başarıyla yüklendi"));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ApiResponse<string>.ErrorResponse("Bir hata oluştu: " + ex.Message));
+        }
+    }
 }
 
