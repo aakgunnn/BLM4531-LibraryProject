@@ -14,10 +14,10 @@ async function init() {
 function showSection(section) {
     document.querySelectorAll('.content-section').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-    
+
     document.getElementById(`${section}Section`).style.display = 'block';
     event.target.classList.add('active');
-    
+
     if (section === 'loans') loadLoans();
     if (section === 'books') loadBooks();
     if (section === 'categories') loadCategories();
@@ -28,14 +28,15 @@ async function loadDashboard() {
     try {
         const booksResponse = await api.get('/api/Books');
         const loansResponse = await api.get('/api/Admin/Loans');
-        
+
         const books = (booksResponse && booksResponse.data) ? booksResponse.data : [];
         const loans = (loansResponse && loansResponse.data) ? loansResponse.data : [];
-        
+
         document.getElementById('totalBooks').textContent = books.length;
         document.getElementById('availableBooks').textContent = books.filter(b => b.isAvailable).length;
-        document.getElementById('pendingLoans').textContent = loans.filter(l => l.status === 0).length;
-        document.getElementById('activeLoans').textContent = loans.filter(l => l.status === 1).length;
+        // Use normalizeStatus for consistent status comparison
+        document.getElementById('pendingLoans').textContent = loans.filter(l => normalizeStatus(l.status) === 'pending').length;
+        document.getElementById('activeLoans').textContent = loans.filter(l => normalizeStatus(l.status) === 'borrowed').length;
     } catch (error) {
         console.error('Dashboard yüklenirken hata:', error);
         showAlert('danger', 'Dashboard yüklenirken hata: ' + error.message);
@@ -56,13 +57,18 @@ async function loadLoans() {
 
 function displayLoans() {
     const tbody = document.getElementById('loansTableBody');
-    
+
     if (allLoans.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center">Ödünç kaydı bulunamadı</td></tr>';
         return;
     }
 
-    tbody.innerHTML = allLoans.map(loan => `
+    // Debug: Log first loan to see status format
+    console.log('First loan status:', allLoans[0]?.status, 'Type:', typeof allLoans[0]?.status);
+
+    tbody.innerHTML = allLoans.map(loan => {
+        const status = normalizeStatus(loan.status);
+        return `
         <tr class="${loan.isLate ? 'table-danger' : ''}">
             <td>${loan.id}</td>
             <td>${loan.userFullName || 'N/A'}</td>
@@ -74,26 +80,36 @@ function displayLoans() {
             </td>
             <td>${getStatusBadge(loan.status)}</td>
             <td>
-                ${loan.status === 0 ? `
+                ${status === 'pending' ? `
                     <button class="btn btn-sm btn-success" onclick="approveLoan(${loan.id})">
                         <i class="bi bi-check-circle"></i> Onayla
                     </button>
                     <button class="btn btn-sm btn-danger" onclick="rejectLoan(${loan.id})">
                         <i class="bi bi-x-circle"></i> Reddet
                     </button>
-                ` : loan.status === 1 ? `
+                ` : status === 'borrowed' ? `
                     <span class="text-muted">Kullanıcı iade edecek</span>
-                ` : loan.status === 2 ? `
+                ` : status === 'returned' ? `
                     <span class="badge bg-success">Tamamlandı</span>
                 ` : '-'}
             </td>
         </tr>
-    `).join('');
+    `}).join('');
+}
+
+// Normalize status to lowercase string for comparison
+function normalizeStatus(status) {
+    if (typeof status === 'string') return status.toLowerCase();
+    if (typeof status === 'number') {
+        const map = { 0: 'pending', 1: 'borrowed', 2: 'returned', 3: 'late', 4: 'cancelled' };
+        return map[status] || 'unknown';
+    }
+    return 'unknown';
 }
 
 async function approveLoan(loanId) {
     if (!confirm('Bu ödünç talebini onaylamak istiyor musunuz?')) return;
-    
+
     try {
         await api.put(`/api/Admin/Loans/${loanId}/approve`, { durationDays: 15 });
         showAlert('success', 'Ödünç talebi onaylandı! Kitap 15 günlüğüne ödünç verildi.');
@@ -107,7 +123,7 @@ async function approveLoan(loanId) {
 
 async function rejectLoan(loanId) {
     const note = prompt('Reddetme sebebi (opsiyonel):');
-    
+
     try {
         await api.put(`/api/Admin/Loans/${loanId}/reject`, { adminNote: note });
         showAlert('success', 'Ödünç talebi reddedildi!');
@@ -124,16 +140,16 @@ async function loadBooks() {
     try {
         const booksResponse = await api.get('/api/Books');
         const categoriesResponse = await api.get('/api/Categories');
-        
+
         allBooks = (booksResponse && booksResponse.data) ? booksResponse.data : [];
         allCategories = (categoriesResponse && categoriesResponse.data) ? categoriesResponse.data : [];
-        
+
         // Populate category select
         const select = document.getElementById('bookCategorySelect');
-        select.innerHTML = allCategories.map(c => 
+        select.innerHTML = allCategories.map(c =>
             `<option value="${c.id}">${c.name}</option>`
         ).join('');
-        
+
         displayBooks();
     } catch (error) {
         console.error('Kitaplar yüklenirken hata:', error);
@@ -143,7 +159,7 @@ async function loadBooks() {
 
 function displayBooks() {
     const tbody = document.getElementById('booksTableBody');
-    
+
     if (allBooks.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="text-center">Kitap bulunamadı</td></tr>';
         return;
@@ -186,7 +202,7 @@ async function toggleAvailability(bookId, newStatus) {
 
 async function deleteBook(bookId) {
     if (!confirm('Bu kitabı silmek istediğinizden emin misiniz?')) return;
-    
+
     try {
         await api.delete(`/api/Books/${bookId}`);
         showAlert('success', 'Kitap başarıyla silindi!');
@@ -201,7 +217,7 @@ async function deleteBook(bookId) {
 async function uploadBookImage(file) {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     try {
         const response = await api.post('/api/Books/upload-image', formData);
         return response.data; // Returns the image URL
@@ -218,11 +234,11 @@ function clearImagePreview() {
 }
 
 // Image preview on file selection
-document.getElementById('bookImageInput').addEventListener('change', function(e) {
+document.getElementById('bookImageInput').addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (file) {
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function (event) {
             document.getElementById('previewImg').src = event.target.result;
             document.getElementById('imagePreview').style.display = 'block';
         };
@@ -233,7 +249,7 @@ document.getElementById('bookImageInput').addEventListener('change', function(e)
 // Add Book Form
 document.getElementById('addBookForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData(e.target);
     const data = {
         title: formData.get('title'),
@@ -243,7 +259,7 @@ document.getElementById('addBookForm').addEventListener('submit', async (e) => {
         publishYear: formData.get('publishYear') ? parseInt(formData.get('publishYear')) : null,
         isAvailable: true
     };
-    
+
     try {
         // Upload image if selected
         const imageInput = document.getElementById('bookImageInput');
@@ -251,7 +267,7 @@ document.getElementById('addBookForm').addEventListener('submit', async (e) => {
             const imageUrl = await uploadBookImage(imageInput.files[0]);
             data.imageUrl = imageUrl;
         }
-        
+
         await api.post('/api/Books', data);
         showAlert('success', 'Kitap başarıyla eklendi!');
         const modal = document.getElementById('addBookModal');
@@ -280,7 +296,7 @@ async function loadCategories() {
 
 function displayCategories() {
     const tbody = document.getElementById('categoriesTableBody');
-    
+
     if (allCategories.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" class="text-center">Kategori bulunamadı</td></tr>';
         return;
@@ -317,13 +333,13 @@ async function toggleCategory(categoryId, newStatus) {
 // Add Category Form
 document.getElementById('addCategoryForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData(e.target);
     const data = {
         name: formData.get('name'),
         isActive: true
     };
-    
+
     try {
         await api.post('/api/Categories', data);
         showAlert('success', 'Kategori başarıyla eklendi!');
@@ -340,18 +356,19 @@ document.getElementById('addCategoryForm').addEventListener('submit', async (e) 
 
 // Helper Functions
 function getStatusBadge(status) {
+    const normalized = normalizeStatus(status);
     const badges = {
-        0: '<span class="badge bg-warning"><i class="bi bi-clock"></i> Beklemede</span>',
-        1: '<span class="badge bg-primary"><i class="bi bi-book"></i> Ödünçte</span>',
-        2: '<span class="badge bg-success"><i class="bi bi-check-circle"></i> İade Edildi</span>',
-        3: '<span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> Gecikmiş</span>',
-        4: '<span class="badge bg-secondary"><i class="bi bi-x-circle"></i> İptal</span>'
+        'pending': '<span class="badge bg-warning"><i class="bi bi-clock"></i> Beklemede</span>',
+        'borrowed': '<span class="badge bg-primary"><i class="bi bi-book"></i> Ödünçte</span>',
+        'returned': '<span class="badge bg-success"><i class="bi bi-check-circle"></i> İade Edildi</span>',
+        'late': '<span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> Gecikmiş</span>',
+        'cancelled': '<span class="badge bg-secondary"><i class="bi bi-x-circle"></i> İptal</span>'
     };
-    return badges[status] || '<span class="badge bg-secondary">Bilinmiyor</span>';
+    return badges[normalized] || '<span class="badge bg-secondary">Bilinmiyor</span>';
 }
 
 function getAvailabilityBadge(isAvailable) {
-    return isAvailable 
+    return isAvailable
         ? '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Müsait</span>'
         : '<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ödünçte</span>';
 }

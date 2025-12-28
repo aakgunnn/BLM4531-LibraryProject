@@ -64,7 +64,11 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 
 // CORS Configuration
 builder.Services.AddCors(options =>
@@ -90,8 +94,32 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<LibraryDbContext>();
+        
+        // FIX: Make DueDate nullable before migrations
+        try
+        {
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            await using var connection = new Npgsql.NpgsqlConnection(connectionString);
+            await connection.OpenAsync();
+            await using var command = connection.CreateCommand();
+            command.CommandText = @"ALTER TABLE ""Loans"" ALTER COLUMN ""DueDate"" DROP NOT NULL;";
+            await command.ExecuteNonQueryAsync();
+            Console.WriteLine("✅ DueDate kolonu nullable yapıldı!");
+        }
+        catch (Npgsql.PostgresException ex) when (ex.SqlState == "42P01")
+        {
+            // Table doesn't exist yet, this is fine
+            Console.WriteLine("ℹ️ Loans tablosu henüz yok, migration ile oluşturulacak.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ DueDate fix uyarısı: {ex.Message}");
+        }
+        
+        await context.Database.MigrateAsync();
         await context.Database.MigrateAsync();
         await DbSeeder.SeedAsync(context);
+        await DbSeeder.ForceUpdateImagesAsync(context); // Force update images for existing data
     }
     catch (Exception ex)
     {
@@ -99,6 +127,7 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "An error occurred while migrating or seeding the database.");
     }
 }
+
 
 // Swagger - always enabled
 app.UseSwagger();

@@ -84,6 +84,54 @@ const api = {
   delete(endpoint) {
     return this.request(endpoint, { method: "DELETE" });
   },
+
+  // File upload method (multipart/form-data)
+  async upload(endpoint, formData) {
+    const token = localStorage.getItem("token");
+
+    const config = {
+      method: "POST",
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+        // Don't set Content-Type, browser will set it with boundary
+      },
+      body: formData,
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+      // Handle unauthorized
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/pages/login.html";
+        throw new Error("Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.");
+      }
+
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const text = await response.text();
+        data = text ? JSON.parse(text) : { success: true };
+      } else {
+        data = { success: true };
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || data.title || "Bir hata oluştu");
+      }
+
+      return data;
+    } catch (error) {
+      if (error.name === "TypeError" && error.message === "Failed to fetch") {
+        throw new Error(
+          "Sunucuya bağlanılamadı. Lütfen internet bağlantınızı kontrol edin."
+        );
+      }
+      throw error;
+    }
+  },
 };
 
 // Helper functions

@@ -88,6 +88,7 @@ public class BookService : IBookService
             CategoryId = dto.CategoryId,
             ISBN = dto.ISBN,
             PublishYear = dto.PublishYear,
+            ImageUrl = dto.ImageUrl,
             IsAvailable = dto.IsAvailable,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -119,6 +120,7 @@ public class BookService : IBookService
         book.CategoryId = dto.CategoryId;
         book.ISBN = dto.ISBN;
         book.PublishYear = dto.PublishYear;
+        book.ImageUrl = dto.ImageUrl;
         book.IsAvailable = dto.IsAvailable;
         book.UpdatedAt = DateTime.UtcNow;
 
@@ -150,6 +152,7 @@ public class BookService : IBookService
             CategoryName = categoryName,
             ISBN = book.ISBN,
             PublishYear = book.PublishYear,
+            ImageUrl = book.ImageUrl,
             IsAvailable = book.IsAvailable
         };
     }

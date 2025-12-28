@@ -1,59 +1,50 @@
 <!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kitap Kataloğu - Kütüphane Sistemi</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-    />
-    <link rel="stylesheet" href="/css/style.css" />
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container">
-        <a class="navbar-brand" href="/">
-          <i class="bi bi-book"></i> Kütüphane Sistemi
-        </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto" id="navMenu"></ul>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kitap Kataloğu - Kütüphane Sistemi</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <i class="bi bi-book"></i> Kütüphane Sistemi
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto" id="navMenu"></ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="py-5">
+    <div class="container">
+      <div class="row mb-4">
+        <div class="col">
+          <h2><i class="bi bi-book-half"></i> Kitap Kataloğu</h2>
+          <p class="text-muted" id="catalogSubtitle">
+            Kütüphane kitaplarını keşfedin ve ödünç alın
+          </p>
         </div>
       </div>
-    </nav>
 
-    <main class="py-5">
-      <div class="container">
-        <div class="row mb-4">
-          <div class="col">
-            <h2><i class="bi bi-book-half"></i> Kitap Kataloğu</h2>
-            <p class="text-muted" id="catalogSubtitle">
-              Kütüphane kitaplarını keşfedin ve ödünç alın
-            </p>
-          </div>
-        </div>
+      <script>
+        // Admin için farklı başlık ve stiller
+        if (typeof isAdmin === "function" && isAdmin()) {
+          document.getElementById("catalogSubtitle").innerHTML =
+            '<i class="bi bi-shield-fill text-warning me-2"></i><strong class="text-warning">ADMIN MOD AKTİF:</strong> Kitapları düzenleyin, silin ve yönetin';
 
-        <script>
-          // Admin için farklı başlık ve stiller
-          if (typeof isAdmin === "function" && isAdmin()) {
-            document.getElementById("catalogSubtitle").innerHTML =
-              '<i class="bi bi-shield-fill text-warning me-2"></i><strong class="text-warning">ADMIN MOD AKTİF:</strong> Kitapları düzenleyin, silin ve yönetin';
-
-            // Admin için özel stil ekle
-            const style = document.createElement("style");
-            style.textContent = `
+          // Admin için özel stil ekle
+          const style = document.createElement("style");
+          style.textContent = `
                .book-card.border-primary {
                  border: 2px solid #0d6efd !important;
                  transition: transform 0.2s, box-shadow 0.2s;
@@ -66,208 +57,191 @@
                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
                }
              `;
-            document.head.appendChild(style);
-          }
-        </script>
+          document.head.appendChild(style);
+        }
+      </script>
 
-        <!-- Search and Filter -->
-        <div class="row mb-4">
-          <div class="col-md-6">
-            <div class="input-group">
-              <span class="input-group-text"><i class="bi bi-search"></i></span>
-              <input
-                type="text"
-                class="form-control"
-                id="searchInput"
-                placeholder="Kitap adı veya yazar ara..."
-              />
-              <button class="btn btn-primary" onclick="searchBooks()">
-                Ara
-              </button>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <select
-              class="form-select"
-              id="categoryFilter"
-              onchange="searchBooks()"
-            >
-              <option value="">Tüm Kategoriler</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <select
-              class="form-select"
-              id="availabilityFilter"
-              onchange="searchBooks()"
-            >
-              <option value="">Tüm Kitaplar</option>
-              <option value="true">Sadece Müsait</option>
-              <option value="false">Ödünçte</option>
-            </select>
+      <!-- Search and Filter -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="searchInput" placeholder="Kitap adı veya yazar ara..." />
+            <button class="btn btn-primary" onclick="searchBooks()">
+              Ara
+            </button>
           </div>
         </div>
+        <div class="col-md-4">
+          <select class="form-select" id="categoryFilter" onchange="searchBooks()">
+            <option value="">Tüm Kategoriler</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" id="availabilityFilter" onchange="searchBooks()">
+            <option value="">Tüm Kitaplar</option>
+            <option value="true">Sadece Müsait</option>
+            <option value="false">Ödünçte</option>
+          </select>
+        </div>
+      </div>
 
-        <div id="alertContainer"></div>
+      <div id="alertContainer"></div>
 
-        <!-- Books Grid -->
-        <div
-          class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4"
-          id="booksContainer"
-        >
-          <div class="col-12 text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Yükleniyor...</span>
-            </div>
+      <!-- Books Grid -->
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" id="booksContainer">
+        <div class="col-12 text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
           </div>
         </div>
       </div>
-    </main>
+    </div>
+  </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/api.js"></script>
-    <script src="/js/auth.js"></script>
-    <script>
-      requireAuth();
-      updateNavigation(); // Navbar'ı güncelle
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    requireAuth();
+    updateNavigation(); // Navbar'ı güncelle
 
-      // DEBUG: Admin kontrolü - DETAYLI
-      console.log("=== 🔍 CATALOG DEBUG - DETAYLI ===");
-      const currentUser = getCurrentUser();
-      const adminCheck = isAdmin();
-      console.log(
-        "📦 localStorage token:",
-        localStorage.getItem("token") ? "VAR ✅" : "YOK ❌"
-      );
-      console.log("👤 localStorage user:", localStorage.getItem("user"));
-      console.log("🧑 getCurrentUser():", currentUser);
-      console.log("🛡️ isAdmin():", adminCheck);
-      if (currentUser) {
-        console.log("👔 User Role:", currentUser.role);
-        console.log("✅ Role === 'Admin':", currentUser.role === "Admin");
-      }
-      console.log("================================");
+    // DEBUG: Admin kontrolü - DETAYLI
+    console.log("=== 🔍 CATALOG DEBUG - DETAYLI ===");
+    const currentUser = getCurrentUser();
+    const adminCheck = isAdmin();
+    console.log(
+      "📦 localStorage token:",
+      localStorage.getItem("token") ? "VAR ✅" : "YOK ❌"
+    );
+    console.log("👤 localStorage user:", localStorage.getItem("user"));
+    console.log("🧑 getCurrentUser():", currentUser);
+    console.log("🛡️ isAdmin():", adminCheck);
+    if (currentUser) {
+      console.log("👔 User Role:", currentUser.role);
+      console.log("✅ Role === 'Admin':", currentUser.role === "Admin");
+    }
+    console.log("================================");
 
-      let allBooks = [];
-      let categories = [];
+    let allBooks = [];
+    let categories = [];
 
-      async function init() {
-        await loadCategories();
-        await loadBooks();
-      }
+    async function init() {
+      await loadCategories();
+      await loadBooks();
+    }
 
-      async function loadCategories() {
-        try {
-          const response = await api.get("/api/Categories");
-          console.log("Categories response:", response);
+    async function loadCategories() {
+      try {
+        const response = await api.get("/api/Categories");
+        console.log("Categories response:", response);
 
-          // API response format: { success: true, data: [...] }
-          categories = response && response.data ? response.data : [];
+        // API response format: { success: true, data: [...] }
+        categories = response && response.data ? response.data : [];
 
-          const categoryFilter = document.getElementById("categoryFilter");
-          if (Array.isArray(categories)) {
-            categories.forEach((cat) => {
-              categoryFilter.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
-            });
-          }
-        } catch (error) {
-          console.error("Kategoriler yüklenemedi:", error);
-          categories = [];
+        const categoryFilter = document.getElementById("categoryFilter");
+        if (Array.isArray(categories)) {
+          categories.forEach((cat) => {
+            categoryFilter.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+          });
         }
+      } catch (error) {
+        console.error("Kategoriler yüklenemedi:", error);
+        categories = [];
       }
+    }
 
-      async function loadBooks() {
-        try {
-          const response = await api.get("/api/Books");
-          console.log("Books response:", response);
+    async function loadBooks() {
+      try {
+        const response = await api.get("/api/Books");
+        console.log("Books response:", response);
 
-          // API response format: { success: true, data: [...] }
-          allBooks = response && response.data ? response.data : [];
+        // API response format: { success: true, data: [...] }
+        allBooks = response && response.data ? response.data : [];
 
-          if (Array.isArray(allBooks)) {
-            displayBooks(allBooks);
-          } else {
-            console.error("Books is not an array:", allBooks);
-            showAlert("danger", "Kitaplar yüklenemedi");
-          }
-        } catch (error) {
-          console.error("Kitaplar yüklenirken hata:", error);
-          showAlert(
-            "danger",
-            "Kitaplar yüklenirken hata oluştu: " + error.message
-          );
-          allBooks = [];
+        if (Array.isArray(allBooks)) {
+          displayBooks(allBooks);
+        } else {
+          console.error("Books is not an array:", allBooks);
+          showAlert("danger", "Kitaplar yüklenemedi");
         }
-      }
-
-      function searchBooks() {
-        const searchTerm = document
-          .getElementById("searchInput")
-          .value.toLowerCase();
-        const categoryId = document.getElementById("categoryFilter").value;
-        const availability =
-          document.getElementById("availabilityFilter").value;
-
-        let filtered = allBooks.filter((book) => {
-          const matchesSearch =
-            !searchTerm ||
-            book.title.toLowerCase().includes(searchTerm) ||
-            book.author.toLowerCase().includes(searchTerm);
-
-          const matchesCategory = !categoryId || book.categoryId == categoryId;
-
-          const matchesAvailability =
-            !availability || book.isAvailable.toString() === availability;
-
-          return matchesSearch && matchesCategory && matchesAvailability;
-        });
-
-        displayBooks(filtered);
-      }
-
-      function displayBooks(books) {
-        const container = document.getElementById("booksContainer");
-        const userIsAdmin = isAdmin();
-
-        // DEBUG: Her kitap render edildiğinde kontrol - DETAYLI
-        console.log("📚 ========== displayBooks ÇAĞRILDI ==========");
-        console.log("👤 userIsAdmin (isAdmin()):", userIsAdmin);
-        console.log("📖 Kitap sayısı:", books.length);
-        console.log("🎨 userIsAdmin TRUE ise → ADMIN KARTI render edilecek");
-        console.log(
-          "🎨 userIsAdmin FALSE ise → KULLANICI KARTI render edilecek"
+      } catch (error) {
+        console.error("Kitaplar yüklenirken hata:", error);
+        showAlert(
+          "danger",
+          "Kitaplar yüklenirken hata oluştu: " + error.message
         );
-        console.log("============================================");
+        allBooks = [];
+      }
+    }
 
-        if (books.length === 0) {
-          container.innerHTML = `
+    function searchBooks() {
+      const searchTerm = document
+        .getElementById("searchInput")
+        .value.toLowerCase();
+      const categoryId = document.getElementById("categoryFilter").value;
+      const availability =
+        document.getElementById("availabilityFilter").value;
+
+      let filtered = allBooks.filter((book) => {
+        const matchesSearch =
+          !searchTerm ||
+          book.title.toLowerCase().includes(searchTerm) ||
+          book.author.toLowerCase().includes(searchTerm);
+
+        const matchesCategory = !categoryId || book.categoryId == categoryId;
+
+        const matchesAvailability =
+          !availability || book.isAvailable.toString() === availability;
+
+        return matchesSearch && matchesCategory && matchesAvailability;
+      });
+
+      displayBooks(filtered);
+    }
+
+    function displayBooks(books) {
+      const container = document.getElementById("booksContainer");
+      const userIsAdmin = isAdmin();
+
+      // DEBUG: Her kitap render edildiğinde kontrol - DETAYLI
+      console.log("📚 ========== displayBooks ÇAĞRILDI ==========");
+      console.log("👤 userIsAdmin (isAdmin()):", userIsAdmin);
+      console.log("📖 Kitap sayısı:", books.length);
+      console.log("🎨 userIsAdmin TRUE ise → ADMIN KARTI render edilecek");
+      console.log(
+        "🎨 userIsAdmin FALSE ise → KULLANICI KARTI render edilecek"
+      );
+      console.log("============================================");
+
+      if (books.length === 0) {
+        container.innerHTML = `
                     <div class="col-12 text-center py-5">
                         <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc;"></i>
                         <p class="text-muted mt-3">Kitap bulunamadı</p>
                     </div>
                 `;
-          return;
-        }
+        return;
+      }
 
-        // Admin ve User için tamamen farklı kartlar
-        container.innerHTML = books
-          .map((book) => {
-            if (userIsAdmin) {
-              // ========== ADMIN KARTI - TAMAMEN FARKLI TASARIM ==========
-              return `
+      // Admin ve User için tamamen farklı kartlar
+      container.innerHTML = books
+        .map((book) => {
+          if (userIsAdmin) {
+            // ========== ADMIN KARTI - TAMAMEN FARKLI TASARIM ==========
+            return `
                 <div class="col">
                     <div class="card book-card border-primary shadow-sm h-100">
                         <div class="position-absolute top-0 end-0 m-2">
                             <span class="badge bg-primary">ID: ${book.id}</span>
                         </div>
-                        ${book.imageUrl 
-                          ? `<img src="${book.imageUrl}" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">`
-                          : `<div class="book-cover bg-gradient"><i class="bi bi-book text-white"></i></div>`
-                        }
+                        ${book.imageUrl
+                ? `<img src="${book.imageUrl}" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">`
+                : `<div class="book-cover bg-gradient"><i class="bi bi-book text-white"></i></div>`
+              }
                         <div class="card-body">
-                            <h6 class="card-title fw-bold mb-2">${
-                              book.title
-                            }</h6>
+                            <h6 class="card-title fw-bold mb-2">${book.title
+              }</h6>
                             
                             <div class="mb-2">
                                 <small class="text-muted">
@@ -277,80 +251,70 @@
                             
                             <div class="mb-2">
                                 <small class="text-muted">
-                                    <i class="bi bi-tag"></i> ${
-                                      book.categoryName
-                                    }
+                                    <i class="bi bi-tag"></i> ${book.categoryName
+              }
                                 </small>
                             </div>
                             
-                            ${
-                              book.isbn
-                                ? `
+                            ${book.isbn
+                ? `
                                 <div class="mb-2">
                                     <small class="text-primary">
                                         <i class="bi bi-upc"></i> ISBN: ${book.isbn}
                                     </small>
                                 </div>
                             `
-                                : ""
-                            }
+                : ""
+              }
                             
-                            ${
-                              book.publishYear
-                                ? `
+                            ${book.publishYear
+                ? `
                                 <div class="mb-2">
                                     <small class="text-muted">
                                         <i class="bi bi-calendar"></i> Yıl: ${book.publishYear}
                                     </small>
                                 </div>
                             `
-                                : ""
-                            }
+                : ""
+              }
                             
                             <div class="mb-2">
                                 <small class="text-muted">
                                     <i class="bi bi-clock-history"></i> ${new Date(
-                                      book.createdAt
-                                    ).toLocaleDateString("tr-TR")}
+                book.createdAt
+              ).toLocaleDateString("tr-TR")}
                                 </small>
                             </div>
                             
                             <div class="mb-3">
-                                ${
-                                  book.isAvailable
-                                    ? '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Müsait</span>'
-                                    : '<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ödünçte</span>'
-                                }
+                                ${book.isAvailable
+                ? '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Müsait</span>'
+                : '<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ödünçte</span>'
+              }
                             </div>
                             
                             <hr>
                             
                             <!-- ADMIN KONTROL PANELİ -->
                             <div class="d-grid gap-2">
-                                <button class="btn btn-warning btn-sm" onclick="editBook(${
-                                  book.id
-                                })">
+                                <button class="btn btn-warning btn-sm" onclick="editBook(${book.id
+              })">
                                     <i class="bi bi-pencil"></i> Düzenle
                                 </button>
                                 <div class="btn-group" role="group">
-                                    <button class="btn btn-outline-${
-                                      book.isAvailable ? "danger" : "success"
-                                    } btn-sm" 
-                                            onclick="toggleBookAvailability(${
-                                              book.id
-                                            }, ${!book.isAvailable})">
-                                        <i class="bi bi-${
-                                          book.isAvailable ? "x" : "check"
-                                        }-circle"></i> 
-                                        ${
-                                          book.isAvailable
-                                            ? "Devre Dışı"
-                                            : "Aktif Et"
-                                        }
+                                    <button class="btn btn-outline-${book.isAvailable ? "danger" : "success"
+              } btn-sm" 
+                                            onclick="toggleBookAvailability(${book.id
+              }, ${!book.isAvailable})">
+                                        <i class="bi bi-${book.isAvailable ? "x" : "check"
+              }-circle"></i> 
+                                        ${book.isAvailable
+                ? "Devre Dışı"
+                : "Aktif Et"
+              }
                                     </button>
-                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteBook(${
-                                      book.id
-                                    })">
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteBook(${book.id
+              })">
                                         <i class="bi bi-trash"></i> Sil
                                     </button>
                                 </div>
@@ -359,147 +323,165 @@
                     </div>
                 </div>
               `;
-            } else {
-              // ========== KULLANICI KARTI - SADE TASARIM ==========
-              return `
+          } else {
+            // ========== KULLANICI KARTI - SADE TASARIM ==========
+            return `
                 <div class="col">
-                    <div class="card book-card h-100 ${
-                      !book.isAvailable ? "border-warning" : ""
-                    }">
-                        ${book.imageUrl 
-                          ? `<img src="${book.imageUrl}" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">`
-                          : `<div class="book-cover"><i class="bi bi-book"></i></div>`
-                        }
+                    <div class="card book-card h-100 ${!book.isAvailable ? "border-warning" : ""
+              }">
+                        ${book.imageUrl
+                ? `<img src="${book.imageUrl}" class="card-img-top" alt="${book.title}" style="height: 200px; object-fit: cover;">`
+                : `<div class="book-cover"><i class="bi bi-book"></i></div>`
+              }
                         <div class="card-body">
-                            <h6 class="card-title text-truncate-2">${
-                              book.title
-                            }</h6>
-                            <p class="text-muted mb-2"><i class="bi bi-person"></i> ${
-                              book.author
-                            }</p>
-                            <p class="text-muted mb-2"><i class="bi bi-tag"></i> ${
-                              book.categoryName
-                            }</p>
-                            ${
-                              book.publishYear
-                                ? `<p class="text-muted mb-2"><i class="bi bi-calendar"></i> ${book.publishYear}</p>`
-                                : ""
-                            }
+                            <h6 class="card-title text-truncate-2">${book.title
+              }</h6>
+                            <p class="text-muted mb-2"><i class="bi bi-person"></i> ${book.author
+              }</p>
+                            <p class="text-muted mb-2"><i class="bi bi-tag"></i> ${book.categoryName
+              }</p>
+                            ${book.publishYear
+                ? `<p class="text-muted mb-2"><i class="bi bi-calendar"></i> ${book.publishYear}</p>`
+                : ""
+              }
                             
                             <div class="mb-3">
-                                ${
-                                  book.isAvailable
-                                    ? '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Müsait</span>'
-                                    : '<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ödünçte</span>'
-                                }
+                                ${book.isAvailable
+                ? '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Müsait</span>'
+                : '<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ödünçte</span>'
+              }
                             </div>
                             
-                            ${
-                              book.isAvailable
-                                ? `
+                            ${book.isAvailable
+                ? `
                                 <button class="btn btn-primary btn-sm w-100" onclick="borrowBook(${book.id})">
                                     <i class="bi bi-bookmark-plus"></i> Ödünç Al
                                 </button>
                             `
-                                : `
+                : `
                                 <button class="btn btn-secondary btn-sm w-100" disabled>
                                     <i class="bi bi-x-circle"></i> Müsait Değil
                                 </button>
                             `
-                            }
+              }
                         </div>
                     </div>
                 </div>
               `;
-            }
-          })
-          .join("");
+          }
+        })
+        .join("");
+    }
+
+    function getCategoryName(categoryId) {
+      const category = categories.find((c) => c.id === categoryId);
+      return category ? category.name : "Bilinmiyor";
+    }
+
+    function getAvailabilityBadge(isAvailable) {
+      return isAvailable
+        ? '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Müsait</span>'
+        : '<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ödünçte</span>';
+    }
+
+    async function borrowBook(bookId) {
+      // Admin ödünç talebi oluşturamaz!
+      if (isAdmin()) {
+        showAlert(
+          "warning",
+          "Admin kullanıcıları ödünç talebi oluşturamaz. Lütfen Yönetim Paneli'ni kullanın."
+        );
+        return;
       }
 
-      function getCategoryName(categoryId) {
-        const category = categories.find((c) => c.id === categoryId);
-        return category ? category.name : "Bilinmiyor";
+      if (!confirm("Bu kitabı ödünç almak istiyor musunuz?")) {
+        return;
       }
 
-      function getAvailabilityBadge(isAvailable) {
-        return isAvailable
-          ? '<span class="badge bg-success"><i class="bi bi-check-circle"></i> Müsait</span>'
-          : '<span class="badge bg-danger"><i class="bi bi-x-circle"></i> Ödünçte</span>';
+      try {
+        await api.post("/api/Loans", { bookId });
+        showAlert(
+          "success",
+          "Ödünç talebiniz oluşturuldu! Admin onayından sonra kitabı alabilirsiniz."
+        );
+        await loadBooks();
+      } catch (error) {
+        showAlert("danger", "Hata: " + error.message);
       }
+    }
 
-      async function borrowBook(bookId) {
-        // Admin ödünç talebi oluşturamaz!
-        if (isAdmin()) {
-          showAlert(
-            "warning",
-            "Admin kullanıcıları ödünç talebi oluşturamaz. Lütfen Yönetim Paneli'ni kullanın."
-          );
+    // Admin İşlemleri
+    async function editBook(bookId) {
+      window.location.href = `/pages/admin-dashboard.html?tab=books&edit=${bookId}`;
+    }
+
+    async function deleteBook(bookId) {
+      if (!confirm("Bu kitabı silmek istediğinizden emin misiniz?")) return;
+
+      try {
+        await api.delete(`/api/Books/${bookId}`);
+        showAlert("success", "Kitap başarıyla silindi!");
+        await loadBooks();
+      } catch (error) {
+        showAlert("danger", "Hata: " + error.message);
+      }
+    }
+
+    function editBook(bookId) {
+      window.location.href = `/pages/edit-book.html?id=${bookId}`;
+    }
+
+    async function toggleBookAvailability(bookId, newStatus) {
+      try {
+        // Önce kitabın mevcut bilgilerini al
+        const bookResponse = await api.get(`/api/Books/${bookId}`);
+        const book = bookResponse && bookResponse.data ? bookResponse.data : null;
+
+        if (!book) {
+          showAlert("danger", "Kitap bulunamadı!");
           return;
         }
 
-        if (!confirm("Bu kitabı ödünç almak istiyor musunuz?")) {
-          return;
-        }
+        // Tüm bilgileri koruyarak sadece isAvailable'ı güncelle
+        const updateData = {
+          title: book.title,
+          author: book.author,
+          categoryId: book.categoryId,
+          isbn: book.isbn,
+          publishYear: book.publishYear,
+          imageUrl: book.imageUrl,
+          isAvailable: newStatus
+        };
 
-        try {
-          await api.post("/api/Loans", { bookId });
-          showAlert(
-            "success",
-            "Ödünç talebiniz oluşturuldu! Admin onayından sonra kitabı alabilirsiniz."
-          );
-          await loadBooks();
-        } catch (error) {
-          showAlert("danger", "Hata: " + error.message);
-        }
+        await api.put(`/api/Books/${bookId}`, updateData);
+        showAlert("success", "Kitap durumu güncellendi!");
+        await loadBooks();
+      } catch (error) {
+        showAlert("danger", "Hata: " + error.message);
       }
+    }
 
-      // Admin İşlemleri
-      async function editBook(bookId) {
-        window.location.href = `/pages/admin-dashboard.html?tab=books&edit=${bookId}`;
-      }
-
-      async function deleteBook(bookId) {
-        if (!confirm("Bu kitabı silmek istediğinizden emin misiniz?")) return;
-
-        try {
-          await api.delete(`/api/Books/${bookId}`);
-          showAlert("success", "Kitap başarıyla silindi!");
-          await loadBooks();
-        } catch (error) {
-          showAlert("danger", "Hata: " + error.message);
-        }
-      }
-
-      async function toggleBookAvailability(bookId, newStatus) {
-        try {
-          await api.put(`/api/Books/${bookId}`, { isAvailable: newStatus });
-          showAlert("success", "Kitap durumu güncellendi!");
-          await loadBooks();
-        } catch (error) {
-          showAlert("danger", "Hata: " + error.message);
-        }
-      }
-
-      function showAlert(type, message) {
-        const alertHtml = `
+    function showAlert(type, message) {
+      const alertHtml = `
                 <div class="alert alert-${type} alert-dismissible fade show" role="alert">
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `;
-        document.getElementById("alertContainer").innerHTML = alertHtml;
-        setTimeout(() => {
-          document.getElementById("alertContainer").innerHTML = "";
-        }, 5000);
+      document.getElementById("alertContainer").innerHTML = alertHtml;
+      setTimeout(() => {
+        document.getElementById("alertContainer").innerHTML = "";
+      }, 5000);
+    }
+
+    document.getElementById("searchInput").addEventListener("keyup", (e) => {
+      if (e.key === "Enter") {
+        searchBooks();
       }
+    });
 
-      document.getElementById("searchInput").addEventListener("keyup", (e) => {
-        if (e.key === "Enter") {
-          searchBooks();
-        }
-      });
+    init();
+  </script>
+</body>
 
-      init();
-    </script>
-  </body>
 </html>

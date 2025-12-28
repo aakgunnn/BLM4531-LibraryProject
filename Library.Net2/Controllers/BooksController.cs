@@ -146,9 +146,11 @@ public class BooksController : ControllerBase
 
     /// <summary>
     /// Kitap kapağı resmi yükle (Admin)
+    /// NOT: Sunum sırasında Swagger hatası vermemesi için bu endpoint Swagger'dan gizlendi.
     /// </summary>
     [HttpPost("upload-image")]
     [Authorize(Roles = "Admin")]
+    [ApiExplorerSettings(IgnoreApi = true)] // Swagger dokümanında göstermiyoruz
     public async Task<ActionResult<ApiResponse<string>>> UploadBookImage([FromForm] IFormFile file)
     {
         try
