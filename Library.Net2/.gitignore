@@ -1,0 +1,50 @@
+# ===== BUILD & RUNTIME =====
+bin/
+obj/
+/build/
+build_output.txt
+
+# ===== DATABASE =====
+*.db
+*.db-shm
+*.db-wal
+Library.Net2.db
+
+# ===== ENVIRONMENT & SENSITIVE =====
+.vs/
+appsettings.Development.json
+*.user
+*.suo
+
+# ===== TEMPORARY / SCRIPTS =====
+*.sql
+*.ps1
+Library.Net2.http
+TEST_POSTGRESQL.md
+WeatherForecast.cs
+
+# ===== LATEX TEMP FILES =====
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# ===== KEEP THESE =====
+# Controllers/
+# Data/
+# Models/
+# Repositories/
+# Services/
+# Migrations/
+# wwwroot/
+# Program.cs
+# Library.Net2.csproj
+# appsettings.json
+# FinalRapor.tex
+# *.pdf
+
+# Keep PDF reports
+!*.pdf
